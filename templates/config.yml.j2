@@ -14,7 +14,7 @@ log:
   timestamp:
     # string format
     # (if this is no set a unix epoch timestamp will be used)
-    format: {{ kyoushi_log_timestamp.format | default('null') }}
+    {% if kyoushi_log_timestamp.format is not defined %}# {%endif%}format: {{ kyoushi_log_timestamp.format | default('e.g. %m/%d/%Y, %H:%M:%S') }}
     # use UTC time or the local time
     utc: {{ kyoushi_log_timestamp.utc | default('True') }}
     # the log event key to use
