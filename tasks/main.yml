@@ -2,38 +2,6 @@
 # tasks file for kyoushi-simulation
 
 # -------------------------------------------
-# *** Manage user ***
-# -------------------------------------------
-
-- name: Add group to system
-  include_role:
-    name: grog.group
-  vars:
-    group_list:
-    - name: "{{ kyoushi_user_group }}"
-
-- name: Add users to system
-  include_role:
-    name: grog.user
-  vars:
-    user_list:
-    - name: "{{ kyoushi_user_name }}"
-      groups: 
-        - sudo
-        - "{{ kyoushi_user_group }}"
-      shell: "/bin/bash"
-      password: "{{ kyoushi_user_password | password_hash('sha512') }}"
-
-- name: Configure sudoers
-  include_role: 
-    name: grog.sudo
-  vars:
-    sudo_list: 
-    - name: "{{ kyoushi_user_name }}"
-      sudo: "{{ kyoushi_sudo_settings }}"
-
-
-# -------------------------------------------
 # *** Install Requirements ***
 # -------------------------------------------
 
