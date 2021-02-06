@@ -1,0 +1,22 @@
+---
+# defaults file for kyoushi-simulation
+
+kyoushi_user_name: "kyoushi"
+kyoushi_user_password: "kyoushi_pwd"
+kyoushi_user_group: "{{ kyoushi_user_name }}"
+kyoushi_sudo_settings:
+  hosts: ALL
+  as: ALL:ALL
+  commands: ALL
+
+git_access_token: "**insert token here**"
+
+kyoushi_packages:
+  - name: cr-kyoushi-simulation
+    url: "https://__token__:{{ git_access_token }}@git-service.ait.ac.at/api/v4/projects/1822/packages/pypi/simple"
+  - name: cr-kyoushi-statemachines
+    url: "https://__token__:{{ git_access_token }}@git-service.ait.ac.at/api/v4/projects/1848/packages/pypi/simple"
+
+kyoushi_venv_path: /tmp/venv
+kyoushi_venv_python_version: python3.8
+    
