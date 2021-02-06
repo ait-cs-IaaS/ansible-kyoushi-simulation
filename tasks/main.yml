@@ -37,12 +37,17 @@
 # *** Install Requirements ***
 # -------------------------------------------
 
-- name: Ensure python 3.8 and python-pip is installed
+- name: Add python repository
+  ansible.builtin.apt_repository:
+    repo: ppa:deadsnakes/ppa
+  when: kyoushi_venv_python_version < 3.8
+
+- name: Ensure python {{ kyoushi_venv_python_version }} and python-pip is installed
   package:
     name: 
-      - python3.8
+      - "python{{ kyoushi_venv_python_version }}"
       - python3-pip
-    state: latest
+    update_cache: yes
 
 - name: Ensure virtualenv is installed
   pip:
@@ -54,12 +59,19 @@
 # *** Setup kyoushi ***
 # -------------------------------------------
 
+- name: Ensure kyoushi base path exists
+  ansible.builtin.file:
+    path: "{{ kyoushi_base_path }}"
+    owner: "{{ kyoushi_user_name }}"
+    group: "{{ kyoushi_user_group }}"
+    state: directory
+
 - name: Install kyoushi packages
   pip:
     name: "{{ item.name }}"
     extra_args: "--upgrade --extra-index-url {{ item.url }}"
     virtualenv: "{{ kyoushi_venv_path }}"
-    virtualenv_python: "{{ kyoushi_venv_python_version }}" 
+    virtualenv_python: "{{ kyoushi_venv_python_version | string }}" 
   loop: "{{ kyoushi_packages }}"
   become: yes
   become_user: "{{ kyoushi_user_name }}"
@@ -75,3 +87,16 @@
 # *** Configure kyoushi ***
 # -------------------------------------------
 
+- name: Ensure state machine directory exists
+  ansible.builtin.file:
+    path: "{{ kyoushi_sim_config_path }}"
+    owner: "{{ kyoushi_user_name }}"
+    group: "{{ kyoushi_user_group }}"
+    state: directory
+
+- name: Deploy simulation config file
+  template:
+    src: config.yml.j2
+    dest: "{{ kyoushi_sim_config_path }}/config.yml"
+    owner: "{{ kyoushi_user_name }}"
+    group: "{{ kyoushi_user_group }}"
