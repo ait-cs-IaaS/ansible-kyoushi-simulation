@@ -2,12 +2,7 @@
 # defaults file for kyoushi-simulation
 
 kyoushi_user_name: "kyoushi"
-kyoushi_user_password: "kyoushi_pwd"
 kyoushi_user_group: "{{ kyoushi_user_name }}"
-kyoushi_sudo_settings:
-  hosts: ALL
-  as: ALL:ALL
-  commands: ALL
 
 git_access_token: "**insert token here**"
 
