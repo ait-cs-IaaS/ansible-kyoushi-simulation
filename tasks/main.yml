@@ -1,0 +1,77 @@
+---
+# tasks file for kyoushi-simulation
+
+# -------------------------------------------
+# *** Manage user ***
+# -------------------------------------------
+
+- name: Add group to system
+  include_role:
+    name: grog.group
+  vars:
+    group_list:
+    - name: "{{ kyoushi_user_group }}"
+
+- name: Add users to system
+  include_role:
+    name: grog.user
+  vars:
+    user_list:
+    - name: "{{ kyoushi_user_name }}"
+      groups: 
+        - sudo
+        - "{{ kyoushi_user_group }}"
+      shell: "/bin/bash"
+      password: "{{ kyoushi_user_password | password_hash('sha512') }}"
+
+- name: Configure sudoers
+  include_role: 
+    name: grog.sudo
+  vars:
+    sudo_list: 
+    - name: "{{ kyoushi_user_name }}"
+      sudo: "{{ kyoushi_sudo_settings }}"
+
+
+# -------------------------------------------
+# *** Install Requirements ***
+# -------------------------------------------
+
+- name: Ensure python 3.8 and python-pip is installed
+  package:
+    name: 
+      - python3.8
+      - python3-pip
+    state: latest
+
+- name: Ensure virtualenv is installed
+  pip:
+    name: virtualenv
+    executable: pip3
+
+
+# -------------------------------------------
+# *** Setup kyoushi ***
+# -------------------------------------------
+
+- name: Install kyoushi packages
+  pip:
+    name: "{{ item.name }}"
+    extra_args: "--upgrade --extra-index-url {{ item.url }}"
+    virtualenv: "{{ kyoushi_venv_path }}"
+    virtualenv_python: "{{ kyoushi_venv_python_version }}" 
+  loop: "{{ kyoushi_packages }}"
+  become: yes
+  become_user: "{{ kyoushi_user_name }}"
+
+- name: Set group to venv
+  ansible.builtin.file:
+    path: "{{ kyoushi_venv_path }}"
+    owner: "{{ kyoushi_user_name }}"
+    group: "{{ kyoushi_user_group }}"
+
+
+# -------------------------------------------
+# *** Configure kyoushi ***
+# -------------------------------------------
+
