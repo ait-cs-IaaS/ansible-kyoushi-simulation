@@ -9,7 +9,7 @@ kyoushi_user_group: "{{ kyoushi_user_name }}"
 git_access_token: "{{ lookup('env', 'GitAccessToken') }}"
 
 kyoushi_base_path: /etc/kyoushi
-kyoushi_sm_name: sm_name
+kyoushi_sm_name: ait.horde_user
 
 kyoushi_packages:
   - name: cr-kyoushi-simulation
@@ -28,9 +28,11 @@ kyoushi_venv_python_version: 3.8
 kyoushi_statemachines_path: "{{ kyoushi_venv_path }}/lib/python{{kyoushi_venv_python_version}}/site-packages/cr_kyoushi/statemachines"
 
 kyoushi_config_files:
-  - src: config.yml.j2
+  config:
+    src: config.yml.j2
     dst: "{{ kyoushi_sim_config_path }}/config.yml"
-  - src: sm.yml.j2
+  sm:
+    src: sm.yml.j2
     dst: "{{ kyoushi_sim_config_path }}/sm.yml"
     deploy: "{{ kyoushi_simulation_sm_config is defined }}"
 
@@ -76,8 +78,8 @@ kyoushi_sim_config_path: "{{ kyoushi_base_path }}/simulation/{{ kyoushi_sm_name 
 # *** Optional state machine python plugin ***
 # -------------------------------------------
 
-kyoushi_sm_python_plugin_name: "example_plugin"
-kyoushi_sm_python_plugin:
-  - src: "{{ kyoushi_sm_python_plugin_name }}.py" # path to source file
-    dst: "{{ kyoushi_sim_config_path }}/{{ kyoushi_sm_python_plugin_name }}.py"
+# kyoushi_sm_python_plugin_name: "example_plugin"
+# kyoushi_sm_python_plugin:
+#   - src: "{{ kyoushi_sm_python_plugin_name }}.py" # path to source file
+#     dst: "{{ kyoushi_sim_config_path }}/{{ kyoushi_sm_python_plugin_name }}.py"
   # use list to add further files if required
