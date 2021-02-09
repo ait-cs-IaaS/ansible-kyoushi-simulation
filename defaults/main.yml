@@ -9,16 +9,21 @@ kyoushi_user_group: "{{ kyoushi_user_name }}"
 git_access_token: "{{ lookup('env', 'GitAccessToken') }}"
 
 kyoushi_base_path: /etc/kyoushi
-kyoushi_sm_name: test_state_machine
+kyoushi_sm_name: sm_name
 
 kyoushi_packages:
   - name: cr-kyoushi-simulation
+    # version: 'latest' or e.g. '0.3.0'
     url: "https://__token__:{{ git_access_token }}@git-service.ait.ac.at/api/v4/projects/1822/packages/pypi/simple"
   - name: cr-kyoushi-statemachines
+    # version: 'latest' or e.g. '0.1.0'
     url: "https://__token__:{{ git_access_token }}@git-service.ait.ac.at/api/v4/projects/1848/packages/pypi/simple"
+  # In order to install further pip-packages, expand this list:
+  # - name: e.g. 'numpy'
+  #   version: 'latest' or e.g. 1.20.0
 
-kyoushi_venv_path: "{{ kyoushi_base_path }}/venv"
-kyoushi_venv_python_version: 3.7
+kyoushi_venv_path: "/opt/kyoushi/simulation/{{ kyoushi_sm_name }}"
+kyoushi_venv_python_version: 3.8
 
 
 # -------------------------------------------
