@@ -80,6 +80,5 @@ kyoushi_sim_config_path: "{{ kyoushi_base_path }}/simulation/{{ kyoushi_sm_name 
 
 # kyoushi_sm_python_plugin_name: "example_plugin"
 # kyoushi_sm_python_plugin:
-#   - src: "{{ kyoushi_sm_python_plugin_name }}.py" # path to source file
-#     dst: "{{ kyoushi_sim_config_path }}/{{ kyoushi_sm_python_plugin_name }}.py"
-  # use list to add further files if required
+#   src: "{{ kyoushi_sm_python_plugin_name }}.py" # path to source file
+#   dst: "{{ kyoushi_sim_config_path }}/{{ kyoushi_sm_python_plugin_name }}.py"
