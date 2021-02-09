@@ -4,7 +4,9 @@
 kyoushi_user_name: "kyoushi"
 kyoushi_user_group: "{{ kyoushi_user_name }}"
 
-git_access_token: "**insert token here**"
+# The Access Token must be defined as GitAccessToken in the environmental variables.
+# Alternatively, the access token can be passed in to the playbook: '-e git_access_token=XYZ'
+git_access_token: "{{ lookup('env', 'GitAccessToken') }}"
 
 kyoushi_base_path: /etc/kyoushi
 kyoushi_sm_name: test_state_machine
