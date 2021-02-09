@@ -85,7 +85,7 @@
     dest: "{{ item.dst }}"
     owner: "{{ kyoushi_user_name }}"
     group: "{{ kyoushi_user_group }}"
-  loop: "{{ kyoushi_config_files }}"
+  loop: "{{ kyoushi_config_files.values() | list }}"
   when: item.deploy | default(true)
 
 - name: Deploy optional state machine python plugin
@@ -96,4 +96,17 @@
     group: "{{ kyoushi_user_group }}"
     mode: '0644'
   loop: "{{ kyoushi_sm_python_plugin }}"
-  when: item.deploy | default(true)
+  when: item is defined | default(false)
+
+
+# -------------------------------------------
+# *** Custom executable ***
+# -------------------------------------------
+
+- name: Deploy custom executable
+  template:
+    src: "sm_runner.sh.j2"
+    dest: "/home/lreuter/{{ kyoushi_sm_name }}.sh"
+    owner: "{{ kyoushi_user_name }}"
+    group: "{{ kyoushi_user_group }}"
+    mode: a+x
