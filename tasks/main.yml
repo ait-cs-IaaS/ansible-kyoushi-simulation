@@ -90,13 +90,11 @@
 
 - name: Deploy optional state machine python plugin
   ansible.builtin.copy:
-    src: "{{ item.src }}"
-    dest: "{{ item.dst }}"
+    src: "{{ kyoushi_sm_python_plugin.src }}"
+    dest: "{{ kyoushi_sm_python_plugin.dst }}"
     owner: "{{ kyoushi_user_name }}"
     group: "{{ kyoushi_user_group }}"
-    mode: '0644'
-  loop: "{{ kyoushi_sm_python_plugin }}"
-  when: item is defined | default(false)
+  when: kyoushi_sm_python_plugin is defined | default(false)
 
 
 # -------------------------------------------
