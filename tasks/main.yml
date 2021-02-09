@@ -62,9 +62,30 @@
     group: "{{ kyoushi_user_group }}"
     state: directory
 
-- name: Deploy simulation config file
-  template:
-    src: config.yml.j2
-    dest: "{{ kyoushi_sim_config_path }}/config.yml"
+- name: Ensure log directory exists
+  ansible.builtin.file:
+    path: "{{ kyoushi_log_file.path | dirname }}"
     owner: "{{ kyoushi_user_name }}"
     group: "{{ kyoushi_user_group }}"
+    state: directory
+    recurse: yes
+  when: kyoushi_log_file.path is defined
+
+- name: Deploy config files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+    owner: "{{ kyoushi_user_name }}"
+    group: "{{ kyoushi_user_group }}"
+  loop: "{{ kyoushi_config_files }}"
+  when: item.deploy | default(true)
+
+- name: Deploy optional state machine python plugin
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+    owner: "{{ kyoushi_user_name }}"
+    group: "{{ kyoushi_user_group }}"
+    mode: '0644'
+  loop: "{{ kyoushi_sm_python_plugin }}"
+  when: item.deploy | default(true)
