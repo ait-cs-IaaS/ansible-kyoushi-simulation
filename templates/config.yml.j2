@@ -34,4 +34,4 @@ log:
     path: {{ kyoushi_log_file.path | default('sm.log') }}  
 
 # control randomness        
-seed: {{ kyoushi_seed | default(9999999999 | random) }}
+seed: {{ kyoushi_seed | default(4294967296 | random) }}
