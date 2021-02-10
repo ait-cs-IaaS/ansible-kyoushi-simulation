@@ -30,33 +30,36 @@
 - name: Ensure kyoushi base path exists
   ansible.builtin.file:
     path: "{{ kyoushi_base_path }}"
-    owner: "{{ kyoushi_user_name }}"
-    group: "{{ kyoushi_user_group }}"
+    owner: "{{ kyoushi_user_name | default(omit) }}"
+    group: "{{ kyoushi_user_group | default(omit) }}"
     state: directory
+  become: yes
 
 - name: Ensure venv path exists
   ansible.builtin.file:
     path: "{{ kyoushi_venv_path }}"
-    owner: "{{ kyoushi_user_name }}"
-    group: "{{ kyoushi_user_group }}"
+    owner: "{{ kyoushi_user_name | default(omit) }}"
+    group: "{{ kyoushi_user_group | default(omit) }}"
     state: directory
     recurse: yes
+  become: yes
 
 - name: Install kyoushi packages
   pip:
-    name: "{{ item.name }}{% if (item.version | default('latest')) != 'latest' %}=={{ item.version }}{%endif%}"
-    extra_args: "--upgrade {% if item.url is defined %} --extra-index-url {{ item.url }}{%endif%}"
+    name: "{{ item.name }}"
+    version: "{{ item.version | default(omit) }}"
+    extra_args: "{% if item.url is defined %} --extra-index-url {{ item.url }}{%endif%}"
     virtualenv: "{{ kyoushi_venv_path }}"
-    virtualenv_python: "{{ kyoushi_venv_python_version | string }}" 
+    virtualenv_python: "{{ kyoushi_venv_python_version | string }}"
   loop: "{{ kyoushi_packages }}"
   become: yes
-  become_user: "{{ kyoushi_user_name }}"
+  become_user: "{{ kyoushi_user_name | default(omit) }}"
 
 - name: Set group to venv
   ansible.builtin.file:
     path: "{{ kyoushi_venv_path }}"
-    owner: "{{ kyoushi_user_name }}"
-    group: "{{ kyoushi_user_group }}"
+    owner: "{{ kyoushi_user_name | default(omit) }}"
+    group: "{{ kyoushi_user_group | default(omit) }}"
 
 
 # -------------------------------------------
@@ -66,15 +69,15 @@
 - name: Ensure state machine directory exists
   ansible.builtin.file:
     path: "{{ kyoushi_sim_config_path }}"
-    owner: "{{ kyoushi_user_name }}"
-    group: "{{ kyoushi_user_group }}"
+    owner: "{{ kyoushi_user_name | default(omit) }}"
+    group: "{{ kyoushi_user_group | default(omit) }}"
     state: directory
 
 - name: Ensure log directory exists
   ansible.builtin.file:
     path: "{{ kyoushi_log_file.path | dirname }}"
-    owner: "{{ kyoushi_user_name }}"
-    group: "{{ kyoushi_user_group }}"
+    owner: "{{ kyoushi_user_name | default(omit) }}"
+    group: "{{ kyoushi_user_group | default(omit) }}"
     state: directory
     recurse: yes
   when: kyoushi_log_file.path is defined
@@ -83,8 +86,8 @@
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dst }}"
-    owner: "{{ kyoushi_user_name }}"
-    group: "{{ kyoushi_user_group }}"
+    owner: "{{ kyoushi_user_name | default(omit) }}"
+    group: "{{ kyoushi_user_group | default(omit) }}"
   loop: "{{ kyoushi_config_files.values() | list }}"
   when: item.deploy | default(true)
 
@@ -92,8 +95,8 @@
   ansible.builtin.copy:
     src: "{{ kyoushi_sm_python_plugin.src }}"
     dest: "{{ kyoushi_sm_python_plugin.dst }}"
-    owner: "{{ kyoushi_user_name }}"
-    group: "{{ kyoushi_user_group }}"
+    owner: "{{ kyoushi_user_name | default(omit) }}"
+    group: "{{ kyoushi_user_group | default(omit) }}"
   when: kyoushi_sm_python_plugin is defined | default(false)
 
 
@@ -101,10 +104,27 @@
 # *** Custom executable ***
 # -------------------------------------------
 
+- name: Ensure exec directory exists
+  ansible.builtin.file:
+    path: "{{ kyoushi_exec_path }}"
+    owner: "{{ kyoushi_user_name | default(omit) }}"
+    group: "{{ kyoushi_user_group | default(omit) }}"
+    state: directory
+
 - name: Deploy custom executable
   template:
     src: "sm_runner.sh.j2"
-    dest: "/home/lreuter/{{ kyoushi_sm_name }}.sh"
-    owner: "{{ kyoushi_user_name }}"
-    group: "{{ kyoushi_user_group }}"
-    mode: a+x
+    dest: "{{ kyoushi_venv_path }}/{{ kyoushi_sm_effective_name }}.sh" # hardcoded 
+    owner: "{{ kyoushi_user_name | default(omit) }}"
+    group: "{{ kyoushi_user_group | default(omit) }}"
+    mode: '0755'
+
+- name: Create symlink to executable
+  file:
+    src: "{{ kyoushi_venv_path }}/{{ kyoushi_sm_effective_name }}.sh"
+    dest: "/usr/local/bin/{{ kyoushi_sm_effective_name }}"
+    state: link
+    owner: "{{ kyoushi_user_name | default(omit) }}"
+    group: "{{ kyoushi_user_group | default(omit) }}"
+    mode: '0755'
+    force: yes
