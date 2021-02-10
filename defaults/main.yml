@@ -1,15 +1,21 @@
 ---
 # defaults file for kyoushi-simulation
 
-kyoushi_user_name: "kyoushi"
-kyoushi_user_group: "{{ kyoushi_user_name }}"
+
+# Statemachine settings:
+# --------------------------------------------------------------------------
+kyoushi_sm_name: ait.horde_user
+
+# Optional: a specific user can be given for file ownership and permissions:
+# --------------------------------------------------------------------------
+# kyoushi_user_name: "kyoushi"
+# kyoushi_user_group: "{{ kyoushi_user_name }}"
 
 # The Access Token must be defined as GitAccessToken in the environmental variables.
 # Alternatively, the access token can be passed in to the playbook: '-e git_access_token=XYZ'
 git_access_token: "{{ lookup('env', 'GitAccessToken') }}"
 
 kyoushi_base_path: /etc/kyoushi
-kyoushi_sm_name: ait.horde_user
 
 kyoushi_packages:
   - name: cr-kyoushi-simulation
@@ -22,7 +28,7 @@ kyoushi_packages:
   # - name: e.g. 'numpy'
   #   version: 'latest' or e.g. 1.20.0
 
-kyoushi_venv_path: "/opt/kyoushi/simulation/{{ kyoushi_sm_name }}"
+kyoushi_venv_path: "/opt/kyoushi/simulation/{{ kyoushi_sm_effective_name }}"
 kyoushi_venv_python_version: 3.8
 
 kyoushi_statemachines_path: "{{ kyoushi_venv_path }}/lib/python{{kyoushi_venv_python_version}}/site-packages/cr_kyoushi/statemachines"
@@ -36,11 +42,13 @@ kyoushi_config_files:
     dst: "{{ kyoushi_sim_config_path }}/sm.yml"
     deploy: "{{ kyoushi_simulation_sm_config is defined }}"
 
+kyoushi_sm_effective_name: "{{ kyoushi_sm_python_plugin_name | default(kyoushi_sm_name) }}"
+
 # -------------------------------------------
 # *** Default sim config ***
 # -------------------------------------------
 
-kyoushi_sim_config_path: "{{ kyoushi_base_path }}/simulation/{{ kyoushi_sm_name }}"
+kyoushi_sim_config_path: "{{ kyoushi_base_path }}/simulation/{{ kyoushi_sm_effective_name }}"
 
 # kyoushi_plugin_include_names: ['.*']
 # kyoushi_plugin_exclude_names: []
