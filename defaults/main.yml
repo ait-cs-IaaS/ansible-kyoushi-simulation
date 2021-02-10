@@ -1,7 +1,6 @@
 ---
 # defaults file for kyoushi-simulation
 
-
 # Statemachine settings:
 # --------------------------------------------------------------------------
 kyoushi_sm_name: ait.horde_user
@@ -11,27 +10,31 @@ kyoushi_sm_name: ait.horde_user
 # kyoushi_user_name: "kyoushi"
 # kyoushi_user_group: "{{ kyoushi_user_name }}"
 
-# The Access Token must be defined as GitAccessToken in the environmental variables.
-# Alternatively, the access token can be passed in to the playbook: '-e git_access_token=XYZ'
-git_access_token: "{{ lookup('env', 'GitAccessToken') }}"
+# The Access Token must be defined as CR_GITLAB_ACCESS_TOKEN in the environmental variables.
+# --------------------------------------------------------------------------
+CR_GITLAB_ACCESS_TOKEN: "{{ lookup('env', 'CR_GITLAB_ACCESS_TOKEN') }}"
+# Alternatively, the access token can be passed in to the playbook: '-e CR_GITLAB_ACCESS_TOKEN=XYZ'
 
-kyoushi_base_path: /etc/kyoushi
 
-kyoushi_packages:
+kyoushi_sim_package_url: git-service.ait.ac.at/api/v4/projects/1822/packages/pypi/simple
+kyoushi_sm_package_url: git-service.ait.ac.at/api/v4/projects/1848/packages/pypi/simple
+
+kyoushi_base_packages:
   - name: cr-kyoushi-simulation
+    url: "https://__token__:{{ CR_GITLAB_ACCESS_TOKEN }}@{{ kyoushi_sim_package_url }}"
     # version: 'latest' or e.g. '0.3.0'
-    url: "https://__token__:{{ git_access_token }}@git-service.ait.ac.at/api/v4/projects/1822/packages/pypi/simple"
   - name: cr-kyoushi-statemachines
+    url: "https://__token__:{{ CR_GITLAB_ACCESS_TOKEN }}@{{ kyoushi_sm_package_url }}"
     # version: 'latest' or e.g. '0.1.0'
-    url: "https://__token__:{{ git_access_token }}@git-service.ait.ac.at/api/v4/projects/1848/packages/pypi/simple"
-  # In order to install further pip-packages, expand this list:
-  # - name: e.g. 'numpy'
-  #   version: 'latest' or e.g. 1.20.0
+
+# kyoushi_additional_packages:
+#   - name: e.g. 'numpy'
+#     version: 'latest' or e.g. 1.20.0
+
+kyoushi_packages: "{{ kyoushi_base_packages + kyoushi_additional_packages | default([]) }}"
 
 kyoushi_venv_path: "/opt/kyoushi/simulation/{{ kyoushi_sm_effective_name }}"
 kyoushi_venv_python_version: 3.8
-
-kyoushi_statemachines_path: "{{ kyoushi_venv_path }}/lib/python{{kyoushi_venv_python_version}}/site-packages/cr_kyoushi/statemachines"
 
 kyoushi_config_files:
   config:
@@ -42,7 +45,10 @@ kyoushi_config_files:
     dst: "{{ kyoushi_sim_config_path }}/sm.yml"
     deploy: "{{ kyoushi_simulation_sm_config is defined }}"
 
+kyoushi_base_path: /etc/kyoushi
+kyoushi_exec_path: "{{ kyoushi_venv_path }}/exec"
 kyoushi_sm_effective_name: "{{ kyoushi_sm_python_plugin_name | default(kyoushi_sm_name) }}"
+
 
 # -------------------------------------------
 # *** Default sim config ***
@@ -64,7 +70,7 @@ kyoushi_sim_config_path: "{{ kyoushi_base_path }}/simulation/{{ kyoushi_sm_effec
 # kyoushi_log_file:
 #   enabled: 'yes'
 #   format: 'json'
-#   path: '/var/log/kyoushi/sm.log'
+#   path: '/var/log/kyoushi/{{ kyoushi_sm_effective_name }}/sm.log'
 
 # kyoushi_seed: 1111111111
 
