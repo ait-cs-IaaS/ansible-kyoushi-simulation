@@ -9,6 +9,7 @@
   ansible.builtin.apt_repository:
     repo: ppa:deadsnakes/ppa
   when: kyoushi_venv_python_version < 3.8
+  become: yes
 
 - name: Ensure python {{ kyoushi_venv_python_version }} and python-pip is installed
   package:
@@ -16,11 +17,13 @@
       - "python{{ kyoushi_venv_python_version }}"
       - python3-pip
     update_cache: yes
+  become: yes
 
 - name: Ensure virtualenv is installed
   pip:
     name: virtualenv
     executable: pip3
+  become: yes
 
 
 # -------------------------------------------
@@ -60,6 +63,7 @@
     path: "{{ kyoushi_venv_path }}"
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
+  become: yes
 
 
 # -------------------------------------------
@@ -72,6 +76,7 @@
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
     state: directory
+  become: yes
 
 - name: Ensure log directory exists
   ansible.builtin.file:
@@ -81,6 +86,7 @@
     state: directory
     recurse: yes
   when: kyoushi_log_file.path is defined
+  become: yes
 
 - name: Deploy config files
   template:
@@ -90,6 +96,7 @@
     group: "{{ kyoushi_user_group | default(omit) }}"
   loop: "{{ kyoushi_config_files.values() | list }}"
   when: item.deploy | default(true)
+  become: yes
 
 - name: Deploy optional state machine python plugin
   ansible.builtin.copy:
@@ -98,6 +105,7 @@
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
   when: kyoushi_sm_python_plugin is defined | default(false)
+  become: yes
 
 
 # -------------------------------------------
@@ -110,6 +118,7 @@
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
     state: directory
+  become: yes
 
 - name: Deploy custom executable
   template:
@@ -118,6 +127,7 @@
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
     mode: '0755'
+  become: yes
 
 - name: Create symlink to executable
   file:
@@ -128,3 +138,4 @@
     group: "{{ kyoushi_user_group | default(omit) }}"
     mode: '0755'
     force: yes
+  become: yes
