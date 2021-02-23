@@ -51,9 +51,10 @@
   pip:
     name: "{{ item.name }}"
     version: "{{ item.version | default(omit) }}"
-    extra_args: "{% if item.url is defined %} --extra-index-url {{ item.url }}{%endif%}"
+    extra_args: "--extra-index-url {{ kyoushi_simulation_package_index }} --extra-index-url {{ kyoushi_statemachines_package_index }}"
     virtualenv: "{{ kyoushi_venv_path }}"
     virtualenv_python: "{{ kyoushi_venv_python_version | string }}"
+    state: "{{ 'forcereinstall' if kyoushi_packages_reinstall else 'present' }}"
   loop: "{{ kyoushi_packages }}"
   become: yes
   become_user: "{{ kyoushi_user_name | default(omit) }}"
