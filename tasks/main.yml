@@ -53,7 +53,7 @@
     version: "{{ item.version | default(omit) }}"
     extra_args: "--extra-index-url {{ kyoushi_simulation_package_index }} --extra-index-url {{ kyoushi_statemachines_package_index }}"
     virtualenv: "{{ kyoushi_venv_path }}"
-    virtualenv_python: "{{ kyoushi_venv_python_version | string }}"
+    virtualenv_python: "python{{ kyoushi_venv_python_version }}"
     state: "{{ 'forcereinstall' if kyoushi_packages_reinstall else 'present' }}"
   loop: "{{ kyoushi_packages }}"
   become: yes
