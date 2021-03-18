@@ -60,6 +60,7 @@ kyoushi_config_files:
 kyoushi_base_path: /etc/kyoushi
 kyoushi_exec_path: "{{ kyoushi_venv_path }}/exec"
 kyoushi_sm_effective_name: "{{ kyoushi_sm_python_plugin_name | default(kyoushi_sm_name) }}"
+kyoushi_executable_template: templates/sm_runner.sh.j2
 
 
 # -------------------------------------------

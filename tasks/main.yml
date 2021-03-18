@@ -123,7 +123,7 @@
 
 - name: Deploy custom executable
   template:
-    src: "sm_runner.sh.j2"
+    src: "{{ kyoushi_executable_template }}"
     dest: "{{ kyoushi_venv_path }}/{{ kyoushi_sm_effective_name }}.sh" # hardcoded 
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
