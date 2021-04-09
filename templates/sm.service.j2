@@ -1,0 +1,14 @@
+[Unit]
+Description=
+Requires=network.target
+After=syslog.target network.target
+
+[Service]
+ExecStart=/usr/local/bin/{{ kyoushi_sm_effective_name }}
+User={{kyoushi_user_name}}
+StandardOutput=null
+StandardError=null
+
+[Install]
+WantedBy=multi-user.target
+
