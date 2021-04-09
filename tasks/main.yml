@@ -72,6 +72,7 @@
 # -------------------------------------------
 
 - name: Ensure state machine directory exists
+  tags: config
   ansible.builtin.file:
     path: "{{ kyoushi_sim_config_path }}"
     owner: "{{ kyoushi_user_name | default(omit) }}"
@@ -80,6 +81,7 @@
   become: yes
 
 - name: Ensure log directory exists
+  tags: config
   ansible.builtin.file:
     path: "{{ kyoushi_log_file.path | dirname }}"
     owner: "{{ kyoushi_user_name | default(omit) }}"
@@ -90,6 +92,7 @@
   become: yes
 
 - name: Deploy config files
+  tags: config
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dst }}"
@@ -100,6 +103,7 @@
   become: yes
 
 - name: Deploy optional state machine python plugin
+  tags: config
   ansible.builtin.copy:
     src: "{{ kyoushi_sm_python_plugin.src }}"
     dest: "{{ kyoushi_sm_python_plugin.dst }}"
@@ -140,3 +144,12 @@
     mode: '0755'
     force: yes
   become: yes
+
+- name: Create systemd service
+  template:
+    src: "{{ kyoushi_service_template }}"
+    dest: "/etc/systemd/system/{{ kyoushi_sm_effective_name }}.service"
+    mode: '0644'
+  become: yes
+  notify: systemctl daemon-reload
+
