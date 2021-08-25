@@ -1,4 +1,4 @@
 #!/bin/bash
 source "{{kyoushi_venv_path}}/bin/activate"
 cd {{ kyoushi_exec_path }}
-cr-kyoushi-sim -c {{ kyoushi_config_files.config.dst }} run {% if kyoushi_config_files.sm.deploy | default(false)%}-s {{ kyoushi_config_files.sm.dst }}{%endif%} -f {{ kyoushi_sm_python_plugin.dst | default(kyoushi_sm_name) }}
+{{ kyoushi_cli }} -c {{ kyoushi_config_files.config.dst }} run {% if kyoushi_config_files.sm.deploy | default(false)%}-s {{ kyoushi_config_files.sm.dst }}{%endif%} -f {{ kyoushi_sm_python_plugin.dst | default(kyoushi_sm_name) }}

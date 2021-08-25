@@ -4,6 +4,7 @@
 # Statemachine settings:
 # --------------------------------------------------------------------------
 kyoushi_sm_name: ait.horde_user
+kyoushi_cli: kyoushi-sim
 
 # Optional: a specific user can be given for file ownership and permissions:
 # --------------------------------------------------------------------------
