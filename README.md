@@ -1,19 +1,13 @@
-kyoushi simulation
-=========
+# kyoushi simulation
 
-The purpose of this role is install cr-kyoushi-simulation and cr-kyoushi-statemachines on the host in order to allow user simulations.
+This role installal cr-kyoushi-simulation and cr-kyoushi-statemachines pip modules on the host in order to allow user simulations.
 
+## Requirements
 
-Requirements
-------------
-
-- A valid gitlab access token with the permission of accessing the cr-kyoushi-simulation and cr-kyoushi-statemachines repos [How to create gitlab access token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) (this token must then be registered as `CR_GITLAB_ACCESS_TOKEN` (as env variable or as ansible var) or can be passed in while executing the playbook by using `-e CR_GITLAB_ACCESS_TOKEN=XYZ`)
 - The server must be installed and configured before executing this role.
 - Furthermore, the tasks of this role require the ansible priviledge escalation.
 
-
-Role Defaults
---------------
+## Role Defaults
 
 | Variable name                                       | Default                                                       | Description                                |
 | --------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------ |
@@ -22,7 +16,6 @@ Role Defaults
 | kyoushi_sm_effective_name                           | *kyoushi_sm_name* or *kyoushi_sm_python_plugin_name* (if set) | effective sm-name for the rest of the role |
 | kyoushi_user_name                                   | *Not set*                                                     | User for file ownership and permissions    |
 | kyoushi_user_group                                  | kyoushi_user_name                                             | Group for file ownership and permissions   |
-| CR_GITLAB_ACCESS_TOKEN                              | env lookup                                                    | Access Token to access custom repos        |
 | kyoushi_sim/sm_package_url                          | ait git projects                                              | URL used to install pip package from       |
 | **kyoushi_base_packages**                           |                                                               |                                            |
 | &nbsp;&nbsp;&nbsp;&nbsp;∟ .name                     | ait git projects                                              | pip package name                           |
@@ -44,9 +37,7 @@ Role Defaults
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;∟ .dst    | kyoushi_sim_config_path                                       | remote path to store the sm config file    |
 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;∟ .deploy | *true* if config is defined                                   | controls wheither sm file is deployed      |
 
-
-Role optional Defaults
---------------
+## Role optional Defaults
 
 In the following a list of options is given, that are, by default, not set:
 
@@ -70,11 +61,9 @@ In the following a list of options is given, that are, by default, not set:
 | &nbsp;&nbsp;&nbsp;&nbsp;∟ .path    | '/var/log/kyoushi/*sm-name*/sm.log' |
 | kyoushi_seed                       | *(N/A)*                             |
 
-
 ## kyoushi state machine config
 
 Different depending on the state machine deployed.
-
 
 ## State machine plugin (optional)
 
@@ -85,20 +74,10 @@ Different depending on the state machine deployed.
 | &nbsp;&nbsp;&nbsp;&nbsp;∟ .src | *kyoushi_sm_python_plugin_name*.py (located in roles *files*) |
 | &nbsp;&nbsp;&nbsp;&nbsp;∟ .dst | *kyoushi_sim_config_path*                                     |
 
+## License
 
+GPL-3.0
 
-Dependencies
-------------
-
-None.
-
-
-License
--------
-
-MIT
-
-Author Information
-------------------
+## Author Information
 
 This role was created in 2021 by Lenhard Reuter

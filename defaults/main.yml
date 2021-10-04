@@ -11,12 +11,6 @@ kyoushi_cli: kyoushi-sim
 # kyoushi_user_name: "kyoushi"
 # kyoushi_user_group: "{{ kyoushi_user_name }}"
 
-# The Access Token must be defined as CR_GITLAB_ACCESS_TOKEN in the environmental variables.
-# --------------------------------------------------------------------------
-#CR_GITLAB_ACCESS_TOKEN: "{{ lookup('env', 'CR_GITLAB_ACCESS_TOKEN') }}"
-# Alternatively, the access token can be passed in to the playbook: '-e CR_GITLAB_ACCESS_TOKEN=XYZ'
-
-
 #kyoushi_sim_package_url: git-service.ait.ac.at/api/v4/projects/1822/packages/pypi/simple
 #kyoushi_sm_package_url: git-service.ait.ac.at/api/v4/projects/1848/packages/pypi/simple
 
@@ -29,9 +23,6 @@ kyoushi_cli: kyoushi-sim
 #kyoushi_statemachines_version: latest
 
 kyoushi_packages_reinstall: no
-
-#kyoushi_simulation_package_index: "https://__token__:{{ CR_GITLAB_ACCESS_TOKEN }}@{{ kyoushi_sim_package_url }}"
-#kyoushi_statemachines_package_index: "https://__token__:{{ CR_GITLAB_ACCESS_TOKEN }}@{{ kyoushi_sm_package_url }}"
 
 kyoushi_packages:
   - name: kyoushi-simulation
