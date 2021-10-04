@@ -1,7 +1,8 @@
 galaxy_info:
   author: Lenhard Reuter
-  description: kyoushi simulation
+  description: Installs pip modules for kyoushi simulation
   company: AIT Austrian Institute of Technology GmbH 
+  role_name: kyoushi_simulation
 
   license: GPL-3.0
 
