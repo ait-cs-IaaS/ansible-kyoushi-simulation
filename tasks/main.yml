@@ -6,149 +6,172 @@
 # -------------------------------------------
 
 - name: Add python repository
+  become: true
   ansible.builtin.apt_repository:
     repo: ppa:deadsnakes/ppa
   when: kyoushi_venv_python_version < 3.8
-  become: yes
 
-- name: Ensure python {{ kyoushi_venv_python_version }} and python-pip is installed
-  package:
-    name: 
-      - "python{{ kyoushi_venv_python_version }}"
+- name: Ensure correct python version and python-pip is installed
+  become: true
+  ansible.builtin.apt:
+    name:
+      - python{{ kyoushi_venv_python_version }}
       - python3-pip
-    update_cache: yes
-  become: yes
+    update_cache: true
 
 - name: Ensure virtualenv is installed
-  pip:
+  become: true
+  ansible.builtin.pip:
     name: virtualenv
     executable: pip3
-  become: yes
-
 
 # -------------------------------------------
 # *** Setup kyoushi ***
 # -------------------------------------------
 
 - name: Ensure kyoushi base path exists
+  become: true
   ansible.builtin.file:
     path: "{{ kyoushi_base_path }}"
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
     state: directory
-  become: yes
+    mode: "0755"
 
 - name: Ensure venv path exists
+  become: true
   ansible.builtin.file:
     path: "{{ kyoushi_venv_path }}"
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
     state: directory
-    recurse: yes
-  become: yes
+    mode: "0755"
+    recurse: true
 
 - name: Install kyoushi packages
-  pip:
+  become: true
+  become_user: "{{ kyoushi_user_name | default(omit) }}"
+  ansible.builtin.pip:
     name: "{{ item.name }}"
     version: "{{ item.version | default(omit) }}"
     virtualenv: "{{ kyoushi_venv_path }}"
-    virtualenv_python: "python{{ kyoushi_venv_python_version }}"
+    virtualenv_python: python{{ kyoushi_venv_python_version }}
     state: "{{ 'forcereinstall' if kyoushi_packages_reinstall else 'present' }}"
   loop: "{{ kyoushi_packages }}"
-  become: yes
+
+# HOTFIX: Copy static requirements.txt to host, using the ansible template
+# module to avoid conflicts with fileglob when kyoushi files are copied
+
+- name: Copy requirements file
+  become: true
+  ansible.builtin.template:
+    src: requirements.txt
+    dest: "{{ kyoushi_venv_path }}/requirements.txt"
+    owner: "{{ kyoushi_user_name | default(omit) }}"
+    group: "{{ kyoushi_user_group | default(omit) }}"
+    mode: "0755"
+
+- name: Install kyoushi packages
+  become: true
   become_user: "{{ kyoushi_user_name | default(omit) }}"
+  ansible.builtin.pip:
+    requirements: "{{ kyoushi_venv_path }}/requirements.txt"
+    virtualenv: "{{ kyoushi_venv_path }}"
+    virtualenv_python: python{{ kyoushi_venv_python_version }}
+    state: forcereinstall
+    extra_args: --no-deps # There are dependency-conflicts. Use this flag to force install.
+  loop: "{{ kyoushi_packages }}"
 
 - name: Set group to venv
+  become: true
   ansible.builtin.file:
     path: "{{ kyoushi_venv_path }}"
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
-  become: yes
-
+    mode: "0755"
 
 # -------------------------------------------
 # *** Configure kyoushi ***
 # -------------------------------------------
 
 - name: Ensure state machine directory exists
-  tags: config
+  become: true
   ansible.builtin.file:
     path: "{{ kyoushi_sim_config_path }}"
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
     state: directory
-  become: yes
+    mode: "0755"
 
 - name: Ensure log directory exists
-  tags: config
+  become: true
   ansible.builtin.file:
     path: "{{ kyoushi_log_file.path | dirname }}"
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
     state: directory
-    recurse: yes
+    mode: "0755"
+    recurse: true
   when: kyoushi_log_file.path is defined
-  become: yes
 
 - name: Deploy config files
-  tags: config
-  template:
+  become: true
+  ansible.builtin.template:
     src: "{{ item.src }}"
     dest: "{{ item.dst }}"
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
+    mode: "0755"
   loop: "{{ kyoushi_config_files.values() | list }}"
   when: item.deploy | default(true)
-  become: yes
 
 - name: Deploy optional state machine python plugin
-  tags: config
+  become: true
   ansible.builtin.copy:
     src: "{{ kyoushi_sm_python_plugin.src }}"
     dest: "{{ kyoushi_sm_python_plugin.dst }}"
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
+    mode: "0755"
   when: kyoushi_sm_python_plugin is defined | default(false)
-  become: yes
-
 
 # -------------------------------------------
 # *** Custom executable ***
 # -------------------------------------------
 
 - name: Ensure exec directory exists
+  become: true
   ansible.builtin.file:
     path: "{{ kyoushi_exec_path }}"
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
     state: directory
-  become: yes
+    mode: "0755"
 
 - name: Deploy custom executable
-  template:
+  become: true
+  ansible.builtin.template:
     src: "{{ kyoushi_executable_template }}"
-    dest: "{{ kyoushi_venv_path }}/{{ kyoushi_sm_effective_name }}.sh" # hardcoded 
+    dest: "{{ kyoushi_venv_path }}/{{ kyoushi_sm_effective_name }}.sh" # hardcoded
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
-    mode: '0755'
-  become: yes
+    mode: "0755"
 
 - name: Create symlink to executable
-  file:
+  become: true
+  ansible.builtin.file:
     src: "{{ kyoushi_venv_path }}/{{ kyoushi_sm_effective_name }}.sh"
-    dest: "/usr/local/bin/{{ kyoushi_sm_effective_name }}"
+    dest: /usr/local/bin/{{ kyoushi_sm_effective_name }}
     state: link
     owner: "{{ kyoushi_user_name | default(omit) }}"
     group: "{{ kyoushi_user_group | default(omit) }}"
-    mode: '0755'
-    force: yes
-  become: yes
+    mode: "0755"
+    force: true
 
 - name: Create systemd service
-  template:
+  become: true
+  ansible.builtin.template:
     src: "{{ kyoushi_service_template }}"
-    dest: "/etc/systemd/system/{{ kyoushi_sm_effective_name }}.service"
-    mode: '0644'
-  become: yes
-  notify: systemctl daemon-reload
-
+    dest: /etc/systemd/system/{{ kyoushi_sm_effective_name }}.service
+    mode: "0644"
+  notify: Systemctl daemon-reload
