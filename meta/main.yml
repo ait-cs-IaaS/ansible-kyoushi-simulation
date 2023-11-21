@@ -1,24 +1,20 @@
+---
 galaxy_info:
   author: Lenhard Reuter
   description: Installs pip modules for kyoushi simulation
-  company: AIT Austrian Institute of Technology GmbH 
+  company: AIT Austrian Institute of Technology GmbH
   role_name: kyoushi_simulation
+  namespace: cyberrange
 
   license: GPL-3.0
 
-  min_ansible_version: 2.4
+  min_ansible_version: "2.4"
 
   platforms:
-  - name: ubuntu
-    versions:
-    - 18.04.3 LTS
-    - 20.04 LTS
+    - name: Ubuntu
+      versions:
+        - bionic
+        - focal
 
-  categories:
-    - user simulation
-    - statemachine
-
-
-  galaxy_tags: [user simulation, statemachine]
-
+  galaxy_tags: [usersimulation, statemachine]
 dependencies: []
